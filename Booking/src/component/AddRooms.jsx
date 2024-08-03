@@ -1,5 +1,5 @@
 import { Link, Form, useNavigation } from "react-router-dom";
-export default function AddHoteles() {
+export default function AddRooms() {
   const navigation = useNavigation();
   const isSubmiting = navigation.state === "submitting";
 
@@ -13,6 +13,8 @@ export default function AddHoteles() {
       address: formElement.address.value,
       price: formElement.price.value,
       image: formElement.images.value,
+      near: formElement.near.value,
+      phone: formElement.phone.value,
     };
 
     console.log(hotelData);
@@ -81,10 +83,24 @@ export default function AddHoteles() {
           </div>
           <div className="mb-4">
             <label
+              htmlFor="near"
+              className="block text-gray-700 font-bold mb-2"
+            >
+              Near by
+            </label>
+            <input
+              type="text"
+              id="near"
+              name="near"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label
               htmlFor="phone"
               className="block text-gray-700 font-bold mb-2"
             >
-              Phone no
+              Phone Number
             </label>
             <input
               type="number"
@@ -99,7 +115,7 @@ export default function AddHoteles() {
             type="submit"
             className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
           >
-            Add Hotels
+            {isSubmiting ? "Adding room" : " Add Room"}
           </button>
         </Form>
       </div>
