@@ -1,9 +1,18 @@
-import { Form, Link, json, redirect, useNavigation } from "react-router-dom";
+import {
+  Form,
+  Link,
+  json,
+  redirect,
+  useNavigation,
+  useRouteError,
+} from "react-router-dom";
 import React from "react";
 
 function LoginForm() {
   const navigation = useNavigation();
   const isSubmiting = navigation.state === "submitting";
+  const err = useRouteError();
+  console.log(err);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -54,9 +63,24 @@ export default LoginForm;
 export async function action({ request }) {
   const formData = await request.formData();
   const userData = {
-    name: formData.get("email"),
+    email: formData.get("email"),
     password: formData.get("password"),
   };
-  console.log(userData);
-  return redirect("");
+
+  const response = await fetch("http://localhost/users/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+  const resData = await response.json();
+  if (!response.ok) {
+    throw json(
+      { message: resData.message || "Field to login user." },
+      { status: 500 }
+    );
+  }
+
+  return redirect("/");
 }

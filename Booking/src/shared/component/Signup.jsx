@@ -1,5 +1,5 @@
 import React from "react";
-import { Form,  Link,  useNavigation } from "react-router-dom";
+import { Form, json, Link, redirect, useNavigation } from "react-router-dom";
 
 export default function SignupForm() {
   const navigation = useNavigation();
@@ -50,7 +50,7 @@ export default function SignupForm() {
           type="submit"
           className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
         >
-          Sign Up
+          {isSubmiting ? "Signing up" : "Sign Up"}
         </button>
         <p className="text-center mt-4">
           Already have an account?
@@ -61,4 +61,34 @@ export default function SignupForm() {
       </Form>
     </div>
   );
+}
+
+export async function action({ request, params }) {
+  const formData = await request.formData();
+  const userData = {
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  };
+
+  try {
+    const response = await fetch("http://localhost/users/signup", {
+      method: "POST",
+      body: JSON.stringify(userData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const resData = await response.json();
+    if (!response.ok) {
+      throw json(
+        { message: resData.message || "Field to create new user. " },
+        { status: 500 }
+      );
+    }
+    return redirect("/login");
+  } catch (err) {
+    throw json({ message: "Field to create new user." }, { status: 500 });
+  }
 }

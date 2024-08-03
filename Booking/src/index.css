@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .text-gold {
+    color: theme("colors.gold.DEFAULT");
+  }
+  .bg-gold {
+    background-color: theme("colors.gold.DEFAULT");
+  }
+  .bg-gold-dark {
+    background-color: theme("colors.gold.dark");
+  }
+}
+
+
+.text-gold {
+    color: theme('colors.gold.DEFAULT');
+  }
+  
+  .border-gold {
+    border-color: theme('colors.gold.DEFAULT');
+  }
+  
+  .hover\:text-gold:hover {
+    color: theme('colors.gold.DEFAULT');
+  }
