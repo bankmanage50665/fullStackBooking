@@ -1,10 +1,19 @@
-import { Link, Form, useNavigation, useNavigate, json } from "react-router-dom";
-export default function AddHoteles() {
+import {
+  Form,
+  useNavigation,
+  useNavigate,
+  useParams,
+  useLoaderData,
+} from "react-router-dom";
+export default function EditHoteles() {
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmiting = navigation.state === "submitting";
+  const sp = useParams();
+  const hotelId = sp.id;
+  const hotel = useLoaderData().hotel;
 
-  async function handleAddHoteles(e) {
+  async function handleUpdateHotel(e) {
     e.preventDefault();
     const formData = new FormData();
     const formElement = e.target.elements;
@@ -16,17 +25,27 @@ export default function AddHoteles() {
       phone: formElement.phone.value,
     };
 
-    const res = await fetch("http://localhost/hoteles/add", {
-      method: "POST",
+    const response = await fetch(`http://localhost/hoteles/${hotelId}`, {
+      method: "PATCH",
       body: JSON.stringify(hotelData),
       headers: {
         "Content-Type": "application/json",
       },
     });
+    const resData = await response.json();
+    if (!response.ok) {
+      throw new Error(resData.message);
+    }
+    navigate(`/hoteles/${hotelId}`);
+  }
 
-    const resData = await res.json();
-    if (!res.ok) {
-      throw json({ message: resData.message }, { status: 500 });
+  async function deleteHotel(id) {
+    const response = await fetch(`http://localhost/hoteles/${id}`, {
+      method: "DELETE",
+    });
+    const resData = await response.json();
+    if (!response.ok) {
+      throw new Error(resData.message);
     }
 
     navigate("/");
@@ -36,7 +55,7 @@ export default function AddHoteles() {
     <>
       <div className="container mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
-        <Form onSubmit={handleAddHoteles}>
+        <Form onSubmit={handleUpdateHotel}>
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -48,6 +67,7 @@ export default function AddHoteles() {
               type="text"
               id="name"
               name="name"
+              defaultValue={hotel && hotel.name}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -61,6 +81,7 @@ export default function AddHoteles() {
             <input
               type="text"
               id="address"
+              defaultValue={hotel && hotel.address}
               name="address"
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -76,6 +97,7 @@ export default function AddHoteles() {
               type="number"
               id="price"
               name="price"
+              defaultValue={hotel && hotel.price}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -90,6 +112,7 @@ export default function AddHoteles() {
               type="text"
               id="images"
               name="images"
+              defaultValue={hotel && hotel.images}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -104,6 +127,7 @@ export default function AddHoteles() {
               type="number"
               id="phone"
               name="phone"
+              defaultValue={hotel && hotel.phone}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -113,9 +137,19 @@ export default function AddHoteles() {
             type="submit"
             className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
           >
-            Add Hotels
+            {isSubmiting ? "Updating..." : "  Update Hotels"}
           </button>
         </Form>
+        <div>
+          <button
+            disabled={isSubmiting}
+            onClick={() => deleteHotel(hotel.id)}
+            type="submit"
+            className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
+          >
+            {isSubmiting ? "Updating..." : "Delete Hotels"}
+          </button>
+        </div>
       </div>
     </>
   );

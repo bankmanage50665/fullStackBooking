@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, json, useLoaderData } from "react-router-dom";
 
 const hotels = [
   {
@@ -89,10 +89,12 @@ const hotels = [
 ];
 
 export default function HotelsList() {
+  const data = useLoaderData();
+  const hoteles = data &&  data.hoteles
   return (
     <>
       <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 bg-gradient-to-r from-gray-800 to-black p-8">
-        {hotels.map((hotel) => (
+        {hoteles.map((hotel) => (
           <li
             key={hotel.id}
             className="flex items-center rounded-lg shadow-md overflow-hidden bg-black text-white"
@@ -100,7 +102,7 @@ export default function HotelsList() {
             <div className="w-1/2 h-full  relative overflow-hidden">
               <img
                 className="absolute inset-0 w-full h-full object-cover object-center"
-                src={hotel.images[0]} // Assuming the first image is the main one
+                src={hotel.images} // Assuming the first image is the main one
                 alt={hotel.name}
               />
             </div>
@@ -133,7 +135,7 @@ export default function HotelsList() {
                 </svg> */}
               </button>
               <Link
-                to={`${hotel.id}`}
+                to={`/hoteles/${hotel.id}`}
                 className="mt-4 block w-full bg-orange-300 text-black font-semibold rounded-md shadow py-2 px-4"
               >
                 View
@@ -144,4 +146,21 @@ export default function HotelsList() {
       </ul>
     </>
   );
+}
+
+export async function loader() {
+  try {
+    const response = await fetch("http://localhost/hoteles/hotelesList");
+    const resData = await response.json();
+
+    if (!response.ok) {
+      throw json(
+        { message: "We couldn't find valid response " },
+        { status: 500 }
+      );
+    }
+    return resData;
+  } catch (err) {
+    throw new Error("Field to fetch list of hoteles.");
+  }
 }

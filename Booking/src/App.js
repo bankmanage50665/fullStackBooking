@@ -7,25 +7,35 @@ import Signup, { action as signupAction } from "./shared/component/Signup";
 import LoginForm, { action as loginAction } from "./shared/component/Login";
 import AddHoteles from "./component/AddHotel";
 import AddRooms from "./component/AddRooms";
-import HotelsList from "./component/HotelsList";
-import HotelRooms from "./component/HotelRooms";
+import HotelsList, { loader as hotelListLoader } from "./component/HotelsList";
+import HotelRooms, { loader as hotelRoomLoader } from "./component/HotelRooms";
 import RootLayout from "./shared/Navigation/RootLayout";
-
+import EditHoteles from "./component/EditHoteles";
 
 const router = createBrowserRouter([
   {
     path: "",
     element: <RootLayout />,
     children: [
-      { index: true, element: <HotelsList /> },
+      { index: true, element: <HotelsList />, loader: hotelListLoader },
       { path: "signup", element: <Signup />, action: signupAction },
       { path: "login", element: <LoginForm />, action: loginAction },
       {
         path: "hoteles",
         children: [
           { path: "add", element: <AddHoteles /> },
-          { path: "add", element: <AddRooms /> },
-          { path: ":id", element: <HotelRooms /> },
+          {
+            path: ":id",
+
+            children: [
+              { index: true, element: <HotelRooms />, loader: hotelRoomLoader },
+              {
+                path: "edit",
+                element: <EditHoteles />,
+                loader: hotelRoomLoader,
+              },
+            ],
+          },
         ],
       },
     ],

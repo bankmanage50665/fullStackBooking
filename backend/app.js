@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 
 const userRoutes = require("./routes/user_routes");
+const hotelRoutes = require("./routes/hotel_routes.js")
 
 const url =
   "mongodb+srv://rahul1234:YaUJqtFam74ZnZvL@cluster0.wdrbduw.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/users", userRoutes);
+app.use("/hoteles", hotelRoutes)
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route", 404);
