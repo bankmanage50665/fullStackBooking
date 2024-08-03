@@ -5,13 +5,14 @@ import LoginForm, { action as loginAction } from "./shared/component/Login";
 import AddHoteles from "./component/AddHotel";
 import AddRooms from "./component/AddRooms";
 import HotelsList from "./component/HotelsList";
+import HotelRooms from "./component/HotelRooms";
 
 const router = createBrowserRouter([
   {
     path: "",
     children: [
       { index: true, element: <HotelsList /> },
-      { path: "login", element: <LoginForm />, action: loginAction },
+      { path: ":id", element: <HotelRooms /> },
     ],
   },
 ]);
