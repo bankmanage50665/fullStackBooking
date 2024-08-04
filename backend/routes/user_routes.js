@@ -21,4 +21,6 @@ router.post(
   userController.login
 );
 
+router.get("/:id", userController.hotelByUserId)
+
 module.exports = router;

@@ -1,31 +1,34 @@
-import { json, Link, useLoaderData } from "react-router-dom";
+import { useState } from "react";
+import { json, Link, useLoaderData, useNavigate } from "react-router-dom";
 
 export default function HotelRooms() {
+  const [book, setBook] = useState(null);
   const data = useLoaderData();
   const hotel = data && data.hotel;
+  const navigate = useNavigate();
 
   async function handleHotelBooking(id) {
+    setBook(true);
     try {
       const res = await fetch(`http://localhost/hoteles/${id}/book`, {
         method: "PATCH",
-        body: JSON.stringify({ status: "Booked" }),
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ status: "Booked" }),
       });
 
       const resData = await res.json();
-
       if (!res.ok) {
-        throw new Error(resData.message);
+        throw new Error(resData.message || "Something went wrong");
       }
-    } catch (err) {
-      throw json(
-        {
-          message: "Field to update hoteles, Please try again later.",
-        },
-        { status: 500 }
-      );
+      console.log("Booking response:", resData);
+
+      setBook(false);
+
+      navigate(`/booked/${id}`);
+    } catch (error) {
+      console.error("Error booking hotel:", error);
     }
   }
 
@@ -62,10 +65,11 @@ export default function HotelRooms() {
               </div>
               <div className="flex items-center mt-4">
                 <button
+                  disabled={book}
                   onClick={() => handleHotelBooking(hotel.id)}
                   className="px-4 py-2 mx-2 bg-orange-500 text-black font-semibold rounded-md hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
                 >
-                  Book Now
+                  {book ? "Booking..." : " Book Now"}
                 </button>
                 <Link
                   to="edit"

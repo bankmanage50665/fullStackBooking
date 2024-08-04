@@ -11,7 +11,9 @@ import HotelsList, { loader as hotelListLoader } from "./component/HotelsList";
 import HotelRooms, { loader as hotelRoomLoader } from "./component/HotelRooms";
 import RootLayout from "./shared/Navigation/RootLayout";
 import EditHoteles from "./component/EditHoteles";
-import BookedHotel from "./component/BookedHotel";
+import BookedHotel, {
+  loader as bookedHotelLoader,
+} from "./component/BookedHotel";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +41,11 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "booked", element: <BookedHotel /> },
+      {
+        path: "booked/:id",
+        element: <BookedHotel />,
+        loader: bookedHotelLoader,
+      },
     ],
   },
 ]);

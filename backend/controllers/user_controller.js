@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 
 const HttpError = require("../middleware/HttpError");
 const User = require("../model/user_model");
+const Hotel = require("../model/hotel_model");
 
 async function signup(req, res, next) {
   const errors = validationResult(req);
@@ -69,8 +70,6 @@ async function login(req, res, next) {
     return next(new HttpError("Field to login, Please try again later.", 401));
   }
 
-
-
   if (!findUser) {
     return next(
       new HttpError(
@@ -102,4 +101,22 @@ async function login(req, res, next) {
     email: findUser.email,
   });
 }
-module.exports = { signup, login };
+
+async function hotelByUserId(req, res, next) {
+  const id = req.params.id;
+
+  if (!id) {
+    return next(
+      new HttpError("Couldn't find id, Please try again later.", 500)
+    );
+  }
+
+  const userHotel = await Hotel.findById(id).populate("bookedBy");
+
+  res.json({
+    message: "Hotel fatched sucessfully",
+    hotel: userHotel.toObject({ getters: true }),
+  });
+}
+
+module.exports = { signup, login, hotelByUserId };

@@ -23,4 +23,6 @@ router.patch("/:id", hotelController.updateHotel);
 router.delete("/:id", hotelController.deleteHotel);
 router.patch("/:id/book", hotelController.bookHotel);
 
+
+
 module.exports = router;
