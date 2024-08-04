@@ -14,6 +14,7 @@ import EditHoteles from "./component/EditHoteles";
 import BookedHotel, {
   loader as bookedHotelLoader,
 } from "./component/BookedHotel";
+import { HotelContextProvider } from "./context/hotelContext";
 
 const router = createBrowserRouter([
   {
@@ -51,7 +52,13 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <HotelContextProvider>
+        <RouterProvider router={router} />;
+      </HotelContextProvider>
+    </>
+  );
 }
 
 reportWebVitals();

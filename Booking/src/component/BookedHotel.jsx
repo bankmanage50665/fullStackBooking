@@ -1,9 +1,15 @@
 import { json, useLoaderData, useParams } from "react-router-dom";
+import HotelContext from "../context/hotelContext";
+import { useContext, useEffect } from "react";
 
 export default function BookedHotel() {
+  const { handleSetHotelId, hotelId } = useContext(HotelContext);
   const data = useLoaderData();
   const hotel = data.hotel;
-  console.log(hotel);
+
+  useEffect(() => {
+    handleSetHotelId(hotel.id);
+  }, []);
 
   return (
     <>
