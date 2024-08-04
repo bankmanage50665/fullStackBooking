@@ -14,7 +14,9 @@ export default function AddHoteles() {
       price: formElement.price.value,
       images: formElement.images.value,
       phone: formElement.phone.value,
+      type: formElement.type.value,
     };
+  
 
     const res = await fetch("http://localhost/hoteles/add", {
       method: "POST",
@@ -25,6 +27,7 @@ export default function AddHoteles() {
     });
 
     const resData = await res.json();
+    console.log(resData);
     if (!res.ok) {
       throw json({ message: resData.message }, { status: 500 });
     }
@@ -35,7 +38,9 @@ export default function AddHoteles() {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
+        <h2 className="text-2xl font-bold text-center mb-4">
+          Add your Hoteles
+        </h2>
         <Form onSubmit={handleAddHoteles}>
           <div className="mb-4">
             <label
@@ -79,6 +84,19 @@ export default function AddHoteles() {
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <div className="mb-4">
+            <label
+              htmlFor="type"
+              className="block text-gray-700 font-bold mb-2"
+            >
+              Select Type
+            </label>
+            <select id="type">
+              <option value="hotel">Hotel</option>
+              <option value="gest">Gest house</option>
+            </select>
+          </div>
+
           <div className="mb-4">
             <label
               htmlFor="images"

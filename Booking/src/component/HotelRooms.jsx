@@ -4,6 +4,31 @@ export default function HotelRooms() {
   const data = useLoaderData();
   const hotel = data && data.hotel;
 
+  async function handleHotelBooking(id) {
+    try {
+      const res = await fetch(`http://localhost/hoteles/${id}/book`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "Booked" }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const resData = await res.json();
+
+      if (!res.ok) {
+        throw new Error(resData.message);
+      }
+    } catch (err) {
+      throw json(
+        {
+          message: "Field to update hoteles, Please try again later.",
+        },
+        { status: 500 }
+      );
+    }
+  }
+
   return (
     <>
       <div className="mx-2 my-4">
@@ -36,7 +61,10 @@ export default function HotelRooms() {
                 <p className="text-gray-400 mt-2">{hotel.description}</p>
               </div>
               <div className="flex items-center mt-4">
-                <button className="px-4 py-2 mx-2 bg-orange-500 text-black font-semibold rounded-md hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                <button
+                  onClick={() => handleHotelBooking(hotel.id)}
+                  className="px-4 py-2 mx-2 bg-orange-500 text-black font-semibold rounded-md hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+                >
                   Book Now
                 </button>
                 <Link

@@ -18,9 +18,9 @@ router.post(
 );
 
 router.get("/hotelesList", hotelController.getHotelesList);
-router.get("/:id", hotelController.hotelById)
-router.patch("/:id", hotelController.updateHotel)
-router.delete("/:id", hotelController.deleteHotel)
-
+router.get("/:id", hotelController.hotelById);
+router.patch("/:id", hotelController.updateHotel);
+router.delete("/:id", hotelController.deleteHotel);
+router.patch("/:id/book", hotelController.bookHotel);
 
 module.exports = router;

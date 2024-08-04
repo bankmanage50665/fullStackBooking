@@ -23,7 +23,7 @@ export default function AddRooms() {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
+        <h2 className="text-2xl font-bold text-center mb-4">Add Your Rooms</h2>
         <Form onSubmit={handleAddHoteles}>
           <div className="mb-4">
             <label
@@ -81,6 +81,11 @@ export default function AddRooms() {
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
+   
+      
+   
+
           <div className="mb-4">
             <label
               htmlFor="near"

@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
 const HttpError = require("../middleware/HttpError");
 const Hotel = require("../model/hotel_model");
+const { default: mongoose } = require("mongoose");
+const User = require("../model/user_model");
 
 async function addHotle(req, res, next) {
   const err = validationResult(req);
@@ -8,12 +10,39 @@ async function addHotle(req, res, next) {
     return next(new HttpError("Invalid inputs", 422));
   }
 
-  const { name, address, price, phone, images } = req.body;
+  const {
+    name,
+    address,
+    price,
+    phone,
+    images,
+    creator = "66af2fc0e51d4950c2429cf6",
+    bookedBy,
+    type,
+    status = "Unbooked",
+  } = req.body;
 
-  const createHoteses = new Hotel({ name, address, price, phone, images });
+  const createHoteses = new Hotel({
+    name,
+    address,
+    price,
+    bookedBy,
+    phone,
+    images,
+    creator,
+    type,
+    status,
+  });
+
+  const findCreator = await User.findById(creator);
 
   try {
-    await createHoteses.save();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createHoteses.save({ session: sess });
+    findCreator.createdRooms.push(createHoteses);
+    await findCreator.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
     return next(new HttpError("Field to create hoteles.", 500));
   }
@@ -109,6 +138,33 @@ async function deleteHotel(req, res, next) {
   res.json({ message: "Hotel delete sucessfully.", hotel: findHotelById });
 }
 
+async function bookHotel(req, res, next) {
+  const hotelId = req.params.id;
+  if (!hotelId) {
+    return next(new HttpError("Couldn't find hotel id"));
+  }
+  const { status, userId = "66af2fc0e51d4950c2429cf6" } = req.body;
+
+  const findHotelToBook = await Hotel.findById(hotelId);
+
+  findHotelToBook.status = status;
+
+  const bookBy = await User.findById(userId);
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await findHotelToBook.save({ session: sess });
+    bookBy.bookedRooms.push(findHotelToBook);
+    await bookBy.save({ session: sess });
+    await sess.commitTransaction();
+  } catch (err) {
+    return next(
+      new HttpError("Field to booked hotel. Please try again later.", 500)
+    );
+  }
+  res.json({ message: "Hotel booked sucessfully.", hotel: findHotelToBook });
+}
 
 module.exports = {
   addHotle,
@@ -116,4 +172,5 @@ module.exports = {
   hotelById,
   updateHotel,
   deleteHotel,
+  bookHotel,
 };
