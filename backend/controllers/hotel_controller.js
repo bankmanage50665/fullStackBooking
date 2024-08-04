@@ -96,7 +96,7 @@ async function updateHotel(req, res, next) {
     return new HttpError("Hotel id is required", 400);
   }
 
-  const { name, address, price, phone } = req.body;
+  const { name, address, price, phone, type, status } = req.body;
 
   const findHotelById = await Hotel.findById(hotelId);
 
@@ -108,6 +108,8 @@ async function updateHotel(req, res, next) {
   findHotelById.address = address;
   findHotelById.price = price;
   findHotelById.phone = phone;
+  findHotelById.type = type;
+  findHotelById.status = status;
 
   try {
     await findHotelById.save();
@@ -145,10 +147,8 @@ async function bookHotel(req, res, next) {
   }
   const { status, userId = "66af59012aec05ace0ccc101" } = req.body;
 
-  
   const findHotelToBook = await Hotel.findById(hotelId);
 
- 
   findHotelToBook.status = status;
 
   const bookBy = await User.findById(userId);
