@@ -3,13 +3,15 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
+const fs = require("fs");
 
 const userRoutes = require("./routes/user_routes");
-const hotelRoutes = require("./routes/hotel_routes.js")
+const hotelRoutes = require("./routes/hotel_routes.js");
 
 const url =
   "mongodb+srv://rahul1234:YaUJqtFam74ZnZvL@cluster0.wdrbduw.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
 
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*"),
@@ -29,7 +31,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/users", userRoutes);
-app.use("/hoteles", hotelRoutes)
+app.use("/hoteles", hotelRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route", 404);
@@ -37,6 +39,10 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.files.forEach((file) => file.path));
+  }
+
   if (res.headerSent) {
     return next(err);
   }

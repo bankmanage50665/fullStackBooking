@@ -16,7 +16,7 @@ export default function BookedHotel() {
       <ul className="hotel-card flex m-2 flex-col justify-between rounded-lg shadow-md overflow-hidden">
         <li className="hotel-image w-full h-48 bg-gray-200">
           <img
-            src={hotel.images}
+            src={`http://localhost/${hotel.images[0]}`}
             className="object-cover h-full w-full"
             alt="{hotel.name} Hotel"
           />

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { json, Link, useLoaderData, useNavigate } from "react-router-dom";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+
 
 export default function HotelRooms() {
   const [book, setBook] = useState(null);
@@ -45,12 +48,19 @@ export default function HotelRooms() {
         </div>
         <li className="bg-gray-900 rounded-lg shadow-md overflow-hidden">
           <div className="flex flex-col  md:flex-row">
-            <div className="md:w-1/2">
-              <img
-                className="w-full h-full object-cover"
-                src={hotel.images}
-                alt={hotel.name}
-              />
+            <div className="w-1/2 h-full">
+              <Carousel
+                showThumbs={false}
+                showStatus={false}
+                autoPlay
+                infiniteLoop
+              >
+                {hotel.images.map((img, index) => (
+                  <div key={index}>
+                    <img src={`http://localhost/${img}`} alt={hotel.name} />
+                  </div>
+                ))}
+              </Carousel>
             </div>
             <div className="p-6 md:w-1/2 text-white flex flex-col justify-between">
               <div>

@@ -5,7 +5,13 @@ import {
   useParams,
   useLoaderData,
 } from "react-router-dom";
+
+import ImageUpload from "../shared/component/ImageUpload";
+import { useState } from "react";
+
+
 export default function EditHoteles() {
+  const [files, setFiles] = useState();
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmiting = navigation.state === "submitting";
@@ -13,7 +19,10 @@ export default function EditHoteles() {
   const hotelId = sp.id;
   const hotel = useLoaderData().hotel;
 
-  console.log(hotel)
+  function handleGetImg(img) {
+    setFiles(img);
+  }
+  console.log(files)
 
   async function handleUpdateHotel(e) {
     e.preventDefault();
@@ -29,12 +38,17 @@ export default function EditHoteles() {
       status: formElement.status.value,
     };
 
+    formData.append("name", hotelData.name);
+    formData.append("address", hotelData.address);
+    formData.append("price", hotelData.price);
+    formData.append("phone", hotelData.phone);
+    formData.append("type", hotelData.type);
+    formData.append("status", hotelData.status);
+    Array.from(files.map((img) => formData.append("images", img)));
+
     const response = await fetch(`http://localhost/hoteles/${hotelId}`, {
       method: "PATCH",
-      body: JSON.stringify(hotelData),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: formData
     });
     const resData = await response.json();
     if (!response.ok) {
@@ -48,6 +62,8 @@ export default function EditHoteles() {
       method: "DELETE",
     });
     const resData = await response.json();
+
+    console.log(resData)
     if (!response.ok) {
       throw new Error(resData.message);
     }
@@ -107,19 +123,7 @@ export default function EditHoteles() {
               />
             </div>
             <div className="mb-4">
-              <label
-                htmlFor="images"
-                className="block text-gray-700 font-bold mb-2"
-              >
-                Hotel Images
-              </label>
-              <input
-                type="text"
-                id="images"
-                name="images"
-                defaultValue={hotel && hotel.images}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <ImageUpload getAllFiles={handleGetImg} />
             </div>
             <div className="mb-4">
               <label

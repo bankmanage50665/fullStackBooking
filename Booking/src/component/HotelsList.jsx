@@ -1,4 +1,6 @@
 import { Link, json, useLoaderData } from "react-router-dom";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 export default function HotelsList() {
   const data = useLoaderData();
@@ -11,12 +13,19 @@ export default function HotelsList() {
             key={hotel.id}
             className="flex items-center rounded-lg shadow-md overflow-hidden bg-black text-white"
           >
-            <div className="w-1/2 h-full  relative overflow-hidden">
-              <img
-                className="absolute inset-0 w-full h-full object-cover object-center"
-                src={hotel.images} // Assuming the first image is the main one
-                alt={hotel.name}
-              />
+            <div className="w-1/2 h-full">
+              <Carousel
+                showThumbs={false}
+                showStatus={false}
+                autoPlay
+                infiniteLoop
+              >
+                {hotel.images.map((img, index) => (
+                  <div key={index}>
+                    <img src={`http://localhost/${img}`} alt={hotel.name} />
+                  </div>
+                ))}
+              </Carousel>
             </div>
             <div className="w-1/2 p-6">
               <h3 className="text-xl font-semibold text-gold">{hotel.name}</h3>

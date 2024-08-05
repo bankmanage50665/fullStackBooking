@@ -5,7 +5,7 @@ const hotelSchema = new Schema({
   name: { type: String, required: true },
   address: { type: String, required: true },
   price: { type: String, required: true },
-  images: { type: String },
+  images: { type: Array, required: true },
   phone: { type: Number, required: true },
   type: { type: String, required: true },
   status: { type: String, required: true },

@@ -1,8 +1,16 @@
 import { Link, Form, useNavigation, useNavigate, json } from "react-router-dom";
+import ImageUpload from "../shared/component/ImageUpload";
+import { useState } from "react";
+
 export default function AddHoteles() {
+  const [files, setFiles] = useState(null);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmiting = navigation.state === "submitting";
+
+  function handleGetFiles(files) {
+    setFiles(files);
+  }
 
   async function handleAddHoteles(e) {
     e.preventDefault();
@@ -12,18 +20,20 @@ export default function AddHoteles() {
       name: formElement.name.value,
       address: formElement.address.value,
       price: formElement.price.value,
-      images: formElement.images.value,
+
       phone: formElement.phone.value,
       type: formElement.type.value,
     };
-  
+    formData.append("name", hotelData.name);
+    formData.append("address", hotelData.address);
+    formData.append("price", hotelData.price);
+    formData.append("phone", hotelData.phone);
+    formData.append("type", hotelData.type);
+    Array.from(files.map((img) => formData.append("images", img)));
 
     const res = await fetch("http://localhost/hoteles/add", {
       method: "POST",
-      body: JSON.stringify(hotelData),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: formData,
     });
 
     const resData = await res.json();
@@ -99,20 +109,6 @@ export default function AddHoteles() {
 
           <div className="mb-4">
             <label
-              htmlFor="images"
-              className="block text-gray-700 font-bold mb-2"
-            >
-              Hotel Images
-            </label>
-            <input
-              type="text"
-              id="images"
-              name="images"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label
               htmlFor="phone"
               className="block text-gray-700 font-bold mb-2"
             >
@@ -125,6 +121,7 @@ export default function AddHoteles() {
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <ImageUpload getAllFiles={handleGetFiles} />
 
           <button
             disabled={isSubmiting}

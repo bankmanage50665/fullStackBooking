@@ -3,6 +3,7 @@ const HttpError = require("../middleware/HttpError");
 const Hotel = require("../model/hotel_model");
 const { default: mongoose } = require("mongoose");
 const User = require("../model/user_model");
+const fs = require("fs");
 
 async function addHotle(req, res, next) {
   const err = validationResult(req);
@@ -10,15 +11,17 @@ async function addHotle(req, res, next) {
     return next(new HttpError("Invalid inputs", 422));
   }
 
+  const imgPath = req.files.map((files) => files.path);
+
   const {
     name,
     address,
     price,
     phone,
-    images,
     creator = "66af59012aec05ace0ccc101",
     bookedBy,
     type,
+    images = imgPath,
     status = "Unbooked",
   } = req.body;
 
@@ -33,6 +36,8 @@ async function addHotle(req, res, next) {
     type,
     status,
   });
+
+  console.log(name);
 
   const findCreator = await User.findById(creator);
 
@@ -98,6 +103,8 @@ async function updateHotel(req, res, next) {
 
   const { name, address, price, phone, type, status } = req.body;
 
+  const imgPath = req.files.map((img) => img.path);
+
   const findHotelById = await Hotel.findById(hotelId);
 
   if (!findHotelById) {
@@ -110,6 +117,7 @@ async function updateHotel(req, res, next) {
   findHotelById.phone = phone;
   findHotelById.type = type;
   findHotelById.status = status;
+  findHotelById.images = imgPath;
 
   try {
     await findHotelById.save();
@@ -129,13 +137,23 @@ async function deleteHotel(req, res, next) {
   }
 
   let findHotelById;
+
   try {
-    findHotelById = await Hotel.findByIdAndDelete(hotelId);
+    findHotelById = await Hotel.findById(hotelId);
+    console.log(findHotelById);
   } catch (err) {
     return next(
       new HttpError("Field to delete hotel, Please try again later.", 500)
     );
   }
+
+  findHotelById.images.forEach((file) =>
+    fs.unlink(file, (err) => {
+      console.log(err);
+    })
+  );
+
+  await findHotelById.deleteOne();
 
   res.json({ message: "Hotel delete sucessfully.", hotel: findHotelById });
 }
