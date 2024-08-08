@@ -1,12 +1,19 @@
 import { Link, Form, useNavigation, useNavigate, json } from "react-router-dom";
+import { useContext, useState } from "react";
+
+
+
 import ImageUpload from "../shared/component/ImageUpload";
-import { useState } from "react";
+import HotelContext from "../context/hotelContext"
 
 export default function AddHoteles() {
   const [isSubmiting, setIsSubmiting] = useState(null)
   const [files, setFiles] = useState(null);
   const navigation = useNavigation();
   const navigate = useNavigate();
+  const { token, userId } = useContext(HotelContext)
+
+
 
   function handleGetFiles(files) {
     setFiles(files);
@@ -29,12 +36,16 @@ export default function AddHoteles() {
     formData.append("address", hotelData.address);
     formData.append("price", hotelData.price);
     formData.append("phone", hotelData.phone);
+    formData.append("creator", userId);
     formData.append("type", hotelData.type);
     Array.from(files.map((img) => formData.append("images", img)));
 
     const res = await fetch("http://localhost/hoteles/add", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: "Bearer " + token
+      }
     });
 
     const resData = await res.json();

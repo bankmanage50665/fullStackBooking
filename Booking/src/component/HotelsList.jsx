@@ -1,10 +1,16 @@
 import { Link, json, useLoaderData } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { useContext } from "react";
+import HotelContext from "../context/hotelContext";
+
 
 export default function HotelsList() {
   const data = useLoaderData();
   const hoteles = data && data.hoteles;
+
+  const {token} = useContext(HotelContext)
+  
   return (
     <>
       <ul className="grid grid-cols-1 h-full md:grid-cols-2 lg:grid-cols-3 gap-8 bg-gradient-to-r from-gray-800 to-black p-8">

@@ -1,9 +1,18 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import HotelContext from "../../context/hotelContext";
 import { useContext } from "react";
 export default function MainNavigation() {
-  const { hotelId } = useContext(HotelContext);
-  
+  const { hotelId, token, handleLogout } = useContext(HotelContext);
+  const navigate = useNavigate()
+
+
+
+  function handleLogoutUser() {
+    handleLogout()
+    navigate('/')
+
+  }
+
   return (
     <>
       <nav className="bg-gradient-to-r from-black via-gray-900 to-black text-white flex items-center justify-between px-4 py-3 shadow-lg">
@@ -20,7 +29,7 @@ export default function MainNavigation() {
               Hotels
             </NavLink>
           </li>
-          <li>
+          {!token && <li>
             <NavLink
               to="/signup"
               className={({ isActive }) =>
@@ -31,8 +40,8 @@ export default function MainNavigation() {
             >
               Signup
             </NavLink>
-          </li>
-          <li>
+          </li>}
+          {!token && <li>
             <NavLink
               to="/login"
               className={({ isActive }) =>
@@ -43,7 +52,20 @@ export default function MainNavigation() {
             >
               Login
             </NavLink>
-          </li>
+          </li>}
+          {token && <li>
+            <button
+
+              // className={({ isActive }) =>
+              //   isActive
+              //     ? "text-gold font-bold border-b-2 border-gold"
+              //     : "hover:text-gold transition duration-300"
+              // }
+              onClick={handleLogoutUser}
+            >
+              Logout
+            </button>
+          </li>}
           <li>
             <NavLink
               to="/hoteles/add"
@@ -57,7 +79,7 @@ export default function MainNavigation() {
             </NavLink>
           </li>
 
-          {hotelId && (
+          {hotelId && token && (
             <li>
               <NavLink
                 to={`/booked/${hotelId}`}

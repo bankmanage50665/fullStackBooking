@@ -5,9 +5,11 @@ import {
   useParams,
   useLoaderData,
 } from "react-router-dom";
+import { useContext, useState } from "react";
 
+
+import HotelContext from "../context/hotelContext";
 import ImageUpload from "../shared/component/ImageUpload";
-import { useState } from "react";
 
 
 export default function EditHoteles() {
@@ -18,11 +20,12 @@ export default function EditHoteles() {
   const sp = useParams();
   const hotelId = sp.id;
   const hotel = useLoaderData().hotel;
+  const { token } = useContext(HotelContext)
 
   function handleGetImg(img) {
     setFiles(img);
   }
-  console.log(files)
+
 
   async function handleUpdateHotel(e) {
     e.preventDefault();
@@ -48,7 +51,10 @@ export default function EditHoteles() {
 
     const response = await fetch(`http://localhost/hoteles/${hotelId}`, {
       method: "PATCH",
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: "Bearer " + token
+      }
     });
     const resData = await response.json();
     if (!response.ok) {
@@ -60,6 +66,9 @@ export default function EditHoteles() {
   async function deleteHotel(id) {
     const response = await fetch(`http://localhost/hoteles/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token
+      }
     });
     const resData = await response.json();
 

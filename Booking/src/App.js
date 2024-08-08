@@ -3,8 +3,8 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Signup, { action as signupAction } from "./shared/component/Signup";
-import LoginForm, { action as loginAction } from "./shared/component/Login";
+import Signup from "./shared/component/Signup";
+import LoginForm from "./shared/component/Login";
 import AddHoteles from "./component/AddHotel";
 import AddRooms from "./component/AddRooms";
 import HotelsList, { loader as hotelListLoader } from "./component/HotelsList";
@@ -20,10 +20,11 @@ const router = createBrowserRouter([
   {
     path: "",
     element: <RootLayout />,
+
     children: [
       { index: true, element: <HotelsList />, loader: hotelListLoader },
-      { path: "signup", element: <Signup />, action: signupAction },
-      { path: "login", element: <LoginForm />, action: loginAction },
+      { path: "signup", element: <Signup /> },
+      { path: "login", element: <LoginForm /> },
       {
         path: "hoteles",
         children: [

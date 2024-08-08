@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { json, Link, useLoaderData, useNavigate } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+
+import HotelContext from "../context/hotelContext";
 
 
 export default function HotelRooms() {
@@ -10,6 +12,8 @@ export default function HotelRooms() {
   const hotel = data && data.hotel;
   const navigate = useNavigate();
 
+  const { userId, token } = useContext(HotelContext)
+
   async function handleHotelBooking(id) {
     setBook(true);
     try {
@@ -17,11 +21,14 @@ export default function HotelRooms() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + token 
         },
-        body: JSON.stringify({ status: "Booked" }),
+        body: JSON.stringify({ status: "Booked", userId }),
       });
 
       const resData = await res.json();
+
+      console.log(resData)
       if (!res.ok) {
         throw new Error(resData.message || "Something went wrong");
       }

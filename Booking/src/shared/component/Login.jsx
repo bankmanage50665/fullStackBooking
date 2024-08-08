@@ -4,20 +4,60 @@ import {
   json,
   redirect,
   useNavigation,
+  useNavigate,
   useRouteError,
 } from "react-router-dom";
-import React from "react";
+import React, { useContext } from "react";
+
+import HotelContext from "../../context/hotelContext";
 
 function LoginForm() {
   const navigation = useNavigation();
   const isSubmiting = navigation.state === "submitting";
-  const err = useRouteError();
-  console.log(err);
+  const navigate = useNavigate()
+  const { handleSetUserId, handleSetToken } = useContext(HotelContext)
+
+
+
+
+  async function handleLogin(e) {
+    const formData = new FormData(e.target)
+    const userData = Object.fromEntries(formData.entries())
+
+    try {
+      const response = await fetch(`http://localhost/users/login`, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const resData = await response.json()
+
+
+
+      if (!response.ok) {
+        throw json(
+          { message: resData.message || "Field to create new user. " },
+          { status: 500 }
+        );
+      }
+      handleSetUserId(resData.userId)
+      handleSetToken(resData.token)
+      navigate("/");
+    } catch (err) {
+      throw json({ message: "Field to create new user" }, { status: 500 })
+    }
+
+  }
+
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-center mb-4 text-black">Login</h2>
-      <Form method="post" action="/login">
+      <Form onSubmit={handleLogin}>
         <div className="mb-4">
           <label htmlFor="email" className="block text-black font-bold mb-2">
             Email
@@ -60,30 +100,30 @@ function LoginForm() {
 
 export default LoginForm;
 
-export async function action({ request }) {
-  const formData = await request.formData();
-  const userData = {
-    email: formData.get("email"),
-    password: formData.get("password"),
-  };
+// export async function action({ request }) {
+//   const formData = await request.formData();
+//   const userData = {
+//     email: formData.get("email"),
+//     password: formData.get("password"),
+//   };
 
-  const response = await fetch("http://localhost/users/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userData),
-  });
-  const resData = await response.json();
+//   const response = await fetch("http://localhost/users/login", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(userData),
+//   });
+//   const resData = await response.json();
 
-  
+//   console.log(resData)
 
-  if (!response.ok) {
-    throw json(
-      { message: resData.message || "Field to login user." },
-      { status: 500 }
-    );
-  }
+//   if (!response.ok) {
+//     throw json(
+//       { message: resData.message || "Field to login user." },
+//       { status: 500 }
+//     );
+//   }
 
-  return redirect("/");
-}
+//   return redirect("/");
+// }

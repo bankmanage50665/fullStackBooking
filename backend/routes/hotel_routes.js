@@ -4,7 +4,12 @@ const { check } = require("express-validator");
 const fileUpload = require("../middleware/imageUpload");
 
 const hotelController = require("../controllers/hotel_controller");
+const authCheck = require("../middleware/auth_check");
 
+router.get("/hotelesList", hotelController.getHotelesList);
+router.get("/:id", hotelController.hotelById);
+
+router.use(authCheck);
 router.post(
   "/add",
   fileUpload.array("images"),
@@ -21,8 +26,6 @@ router.post(
   hotelController.addHotle
 );
 
-router.get("/hotelesList", hotelController.getHotelesList);
-router.get("/:id", hotelController.hotelById);
 router.patch("/:id", fileUpload.array("images"), hotelController.updateHotel);
 router.delete("/:id", hotelController.deleteHotel);
 router.patch("/:id/book", hotelController.bookHotel);

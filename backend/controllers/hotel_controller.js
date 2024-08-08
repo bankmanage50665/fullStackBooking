@@ -18,7 +18,7 @@ async function addHotle(req, res, next) {
     address,
     price,
     phone,
-    creator = "66b50f98f4bd88e446c7482a",
+    creator,
     bookedBy,
     type,
     images = imgPath,
@@ -36,8 +36,6 @@ async function addHotle(req, res, next) {
     type,
     status,
   });
-
-  
 
   const findCreator = await User.findById(creator);
 
@@ -163,9 +161,10 @@ async function bookHotel(req, res, next) {
   if (!hotelId) {
     return next(new HttpError("Couldn't find hotel id"));
   }
-  const { status, userId = "66b50f98f4bd88e446c7482a" } = req.body;
+  const { status, userId } = req.body;
 
   const findHotelToBook = await Hotel.findById(hotelId);
+
 
   findHotelToBook.status = status;
 

@@ -1,14 +1,55 @@
-import React from "react";
-import { Form, json, Link, redirect, useNavigation } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Form, json, Link, redirect, useNavigate, useNavigation } from "react-router-dom";
+import HotelContext from "../../context/hotelContext"
 
 export default function SignupForm() {
+
+
   const navigation = useNavigation();
   const isSubmiting = navigation.state === "submitting";
+  const navigate = useNavigate()
+
+  const { handleSetUserId, handleSetToken } = useContext(HotelContext)
+
+
+
+  async function handleSignup(e) {
+    const formData = new FormData(e.target)
+    const userData = Object.fromEntries(formData.entries())
+
+    try {
+      const response = await fetch(`http://localhost/users/signup`, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const resData = await response.json()
+
+
+      if (!response.ok) {
+        throw json(
+          { message: resData.message || "Field to create new user. " },
+          { status: 500 }
+        );
+      }
+      handleSetUserId(resData.userId)
+      handleSetToken(resData.token)
+
+      navigate("/login");
+    } catch (err) {
+      throw json({ message: "Field to create new user" }, { status: 500 })
+    }
+
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
-      <Form method="post">
+      <Form onSubmit={handleSignup}>
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
             Name
@@ -63,34 +104,35 @@ export default function SignupForm() {
   );
 }
 
-export async function action({ request, params }) {
-  const formData = await request.formData();
-  const userData = {
-    name: formData.get("name"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  };
+// export async function action({ request, params }) {
+//   const formData = await request.formData();
+//   const userData = {
+//     name: formData.get("name"),
+//     email: formData.get("email"),
+//     password: formData.get("password"),
+//   };
 
-  try {
-    const response = await fetch(`http://localhost/users/signup`, {
-      method: 'POST',
-      body: JSON.stringify(userData),
-      headers: {
+//   try {
+//     const response = await fetch(`http://localhost/users/signup`, {
+//       method: 'POST',
+//       body: JSON.stringify(userData),
+//       headers: {
 
-        'Content-Type': 'application/json'
-      }
-    })
+//         'Content-Type': 'application/json'
+//       }
+//     })
 
-    const resData = await response.json()
+//     const resData = await response.json()
 
-    if (!response.ok) {
-      throw json(
-        { message: resData.message || "Field to create new user. " },
-        { status: 500 }
-      );
-    }
-    return redirect("/login");
-  } catch (err) {
-    throw json({ message: "Field to create new user." }, { status: 500 });
-  }
-}
+
+//     if (!response.ok) {
+//       throw json(
+//         { message: resData.message || "Field to create new user. " },
+//         { status: 500 }
+//       );
+//     }
+//     return redirect("/login");
+//   } catch (err) {
+//     throw json({ message: "Field to create new user." }, { status: 500 });
+//   }
+// }

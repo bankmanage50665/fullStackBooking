@@ -34,7 +34,7 @@ async function signup(req, res, next) {
     bookedRooms: [],
     createdRooms: [],
   });
-  
+
   try {
     await createdUser.save();
   } catch (err) {
@@ -54,6 +54,7 @@ async function signup(req, res, next) {
   return res.status(201).json({
     userId: createdUser.id,
     email: createdUser.email,
+    token,
   });
 }
 
@@ -101,6 +102,7 @@ async function login(req, res, next) {
     message: "User login sucessfully.",
     userId: findUser.id,
     email: findUser.email,
+    token,
   });
 }
 
