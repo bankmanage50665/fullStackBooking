@@ -3,16 +3,17 @@ import ImageUpload from "../shared/component/ImageUpload";
 import { useState } from "react";
 
 export default function AddHoteles() {
+  const [isSubmiting, setIsSubmiting] = useState(null)
   const [files, setFiles] = useState(null);
   const navigation = useNavigation();
   const navigate = useNavigate();
-  const isSubmiting = navigation.state === "submitting";
 
   function handleGetFiles(files) {
     setFiles(files);
   }
 
   async function handleAddHoteles(e) {
+    setIsSubmiting(true)
     e.preventDefault();
     const formData = new FormData();
     const formElement = e.target.elements;
@@ -39,10 +40,12 @@ export default function AddHoteles() {
     const resData = await res.json();
     console.log(resData);
     if (!res.ok) {
+      setIsSubmiting(false)
       throw json({ message: resData.message }, { status: 500 });
     }
 
     navigate("/");
+    setIsSubmiting(false)
   }
 
   return (

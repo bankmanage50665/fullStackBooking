@@ -27,12 +27,12 @@ export default function HotelRooms() {
       }
       console.log("Booking response:", resData);
 
-      setBook(false);
 
       navigate(`/booked/${id}`);
     } catch (error) {
       console.error("Error booking hotel:", error);
     }
+    setBook(false);
   }
 
   return (

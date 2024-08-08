@@ -72,15 +72,17 @@ export async function action({ request, params }) {
   };
 
   try {
-    const response = await fetch("http://localhost/users/signup", {
-      method: "POST",
+    const response = await fetch(`http://localhost/users/signup`, {
+      method: 'POST',
       body: JSON.stringify(userData),
       headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    const resData = await response.json();
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const resData = await response.json()
+
     if (!response.ok) {
       throw json(
         { message: resData.message || "Field to create new user. " },

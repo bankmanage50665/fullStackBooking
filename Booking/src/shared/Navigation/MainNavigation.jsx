@@ -3,6 +3,7 @@ import HotelContext from "../../context/hotelContext";
 import { useContext } from "react";
 export default function MainNavigation() {
   const { hotelId } = useContext(HotelContext);
+  
   return (
     <>
       <nav className="bg-gradient-to-r from-black via-gray-900 to-black text-white flex items-center justify-between px-4 py-3 shadow-lg">
@@ -41,6 +42,18 @@ export default function MainNavigation() {
               }
             >
               Login
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/hoteles/add"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-gold font-bold border-b-2 border-gold"
+                  : "hover:text-gold transition duration-300"
+              }
+            >
+              Add Hotel
             </NavLink>
           </li>
 

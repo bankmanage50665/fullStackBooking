@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 
 const HttpError = require("../middleware/HttpError");
 const User = require("../model/user_model");
@@ -33,6 +34,7 @@ async function signup(req, res, next) {
     bookedRooms: [],
     createdRooms: [],
   });
+  
   try {
     await createdUser.save();
   } catch (err) {
@@ -40,14 +42,14 @@ async function signup(req, res, next) {
       new HttpError("Field to created user, Please try again later.", 401)
     );
   }
-  //   let token;
-  //   try {
-  //     token = jwt.sign(
-  //       { userId: createdUser.id, email: createdUser.email },
-  //       "secret",
-  //       { expiresIn: "5h" }
-  //     );
-  //   } catch (err) {}
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      "secret",
+      { expiresIn: "1d" }
+    );
+  } catch (err) {}
 
   return res.status(201).json({
     userId: createdUser.id,
@@ -88,12 +90,12 @@ async function login(req, res, next) {
     );
   }
 
-  // let token;
-  // try {
-  //   token = jwt.sign({ userId: findUser.id, email: findUser.email }, "secret", {
-  //     expiresIn: "5h",
-  //   });
-  // } catch (err) {}
+  let token;
+  try {
+    token = jwt.sign({ userId: findUser.id, email: findUser.email }, "secret", {
+      expiresIn: "1d",
+    });
+  } catch (err) {}
 
   res.json({
     message: "User login sucessfully.",

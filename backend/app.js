@@ -9,8 +9,7 @@ const userRoutes = require("./routes/user_routes");
 const hotelRoutes = require("./routes/hotel_routes.js");
 
 const url =
-  "mongodb+srv://rahul1234:YaUJqtFam74ZnZvL@cluster0.wdrbduw.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
-
+  "mongodb+srv://rahul1234:sKKlTG745dco9r5P@cluster0.wdrbduw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use(bodyParser.json());
 app.use((req, res, next) => {

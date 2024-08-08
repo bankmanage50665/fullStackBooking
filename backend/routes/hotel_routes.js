@@ -14,8 +14,8 @@ router.post(
       { min: 5 },
       check("price").not().isEmpty(),
       check("phone").isLength({ min: 10 }),
-      check("price").not().isEmpty(),
-      check("images").not().isEmpty()
+      check("images").not().isEmpty(),
+      check("type").not().isEmpty()
     ),
   ],
   hotelController.addHotle
