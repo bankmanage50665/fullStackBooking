@@ -4,12 +4,18 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
+const dotEnv = require("dotenv")
+dotEnv.config()
 
 const userRoutes = require("./routes/user_routes");
 const hotelRoutes = require("./routes/hotel_routes.js");
+const HttpError = require("./middleware/HttpError.js")
+const otpRoute = require("./routes/user_routes.js")
 
 const url =
-  "mongodb+srv://rahul1234:sKKlTG745dco9r5P@cluster0.wdrbduw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://rahul1234:rUr3yuJjvRxByRF0@cluster0.wdrbduw.mongodb.net/booking?retryWrites=true&w=majority&appName=Cluster0";
+
+  
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -29,7 +35,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/users", userRoutes);
+// app.use("/users", userRoutes);
+app.use("/otp", otpRoute)
 app.use("/hoteles", hotelRoutes);
 
 app.use((req, res, next) => {

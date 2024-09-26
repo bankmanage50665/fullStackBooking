@@ -9,6 +9,8 @@ export default function HotelsList() {
   const data = useLoaderData();
   const hoteles = data && data.hoteles;
 
+  console.log(hoteles)
+
   const {token} = useContext(HotelContext)
   
   return (

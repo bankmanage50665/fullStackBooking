@@ -10,7 +10,7 @@ async function auth_check(req, res, next) {
     }
     
 
-    const decodedToken = await jwt.verify(token, "secret");
+    const decodedToken =  jwt.verify(token, process.env.JWT_KEY);
     req.userData = { userId: decodedToken.token };
     
     next();

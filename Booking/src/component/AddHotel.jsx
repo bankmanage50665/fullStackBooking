@@ -1,5 +1,6 @@
-import { Link, Form, useNavigation, useNavigate, json } from "react-router-dom";
+import { Link, Form, useNavigation, useNavigate, json, useRouteLoaderData } from "react-router-dom";
 import { useContext, useState } from "react";
+import { getUserId } from "../middleware/getToken";
 
 
 
@@ -11,7 +12,8 @@ export default function AddHoteles() {
   const [files, setFiles] = useState(null);
   const navigation = useNavigation();
   const navigate = useNavigate();
-  const { token, userId } = useContext(HotelContext)
+  const userid = getUserId()
+  const token = useRouteLoaderData("root")
 
 
 
@@ -36,7 +38,7 @@ export default function AddHoteles() {
     formData.append("address", hotelData.address);
     formData.append("price", hotelData.price);
     formData.append("phone", hotelData.phone);
-    formData.append("creator", userId);
+    formData.append("creator", userid);
     formData.append("type", hotelData.type);
     Array.from(files.map((img) => formData.append("images", img)));
 

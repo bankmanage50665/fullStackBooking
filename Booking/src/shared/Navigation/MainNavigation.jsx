@@ -55,7 +55,6 @@ export default function MainNavigation() {
           </li>}
           {token && <li>
             <button
-
               // className={({ isActive }) =>
               //   isActive
               //     ? "text-gold font-bold border-b-2 border-gold"

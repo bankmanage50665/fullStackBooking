@@ -161,10 +161,9 @@ async function bookHotel(req, res, next) {
   if (!hotelId) {
     return next(new HttpError("Couldn't find hotel id"));
   }
-  const { status, userId } = req.body;
+  const { status, userId, bookedFor, checkin, guest } = req.body;
 
   const findHotelToBook = await Hotel.findById(hotelId);
-
 
   findHotelToBook.status = status;
 

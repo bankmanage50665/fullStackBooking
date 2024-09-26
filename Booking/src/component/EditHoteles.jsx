@@ -4,11 +4,11 @@ import {
   useNavigate,
   useParams,
   useLoaderData,
+  useRouteLoaderData,
 } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 
-import HotelContext from "../context/hotelContext";
 import ImageUpload from "../shared/component/ImageUpload";
 
 
@@ -20,7 +20,7 @@ export default function EditHoteles() {
   const sp = useParams();
   const hotelId = sp.id;
   const hotel = useLoaderData().hotel;
-  const { token } = useContext(HotelContext)
+  const token = useRouteLoaderData("root")
 
   function handleGetImg(img) {
     setFiles(img);
