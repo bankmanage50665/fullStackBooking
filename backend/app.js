@@ -4,18 +4,17 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
-const dotEnv = require("dotenv")
-dotEnv.config()
+const dotEnv = require("dotenv");
+dotEnv.config();
 
-const userRoutes = require("./routes/user_routes");
+const bookingRouter = require("./routes/booking_routes.js");
 const hotelRoutes = require("./routes/hotel_routes.js");
-const HttpError = require("./middleware/HttpError.js")
-const otpRoute = require("./routes/user_routes.js")
+const HttpError = require("./middleware/HttpError.js");
+const otpRoute = require("./routes/user_routes.js");
 
 const url =
   "mongodb+srv://rahul1234:rUr3yuJjvRxByRF0@cluster0.wdrbduw.mongodb.net/booking?retryWrites=true&w=majority&appName=Cluster0";
 
-  
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -36,8 +35,9 @@ app.use((req, res, next) => {
 });
 
 // app.use("/users", userRoutes);
-app.use("/otp", otpRoute)
+app.use("/otp", otpRoute);
 app.use("/hoteles", hotelRoutes);
+app.use("/bookings", bookingRouter);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route", 404);

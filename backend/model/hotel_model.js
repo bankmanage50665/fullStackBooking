@@ -10,9 +10,8 @@ const hotelSchema = new Schema({
   type: { type: String, required: true },
   status: { type: String, required: true },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-  bookedBy: { type: mongoose.Types.ObjectId, ref: "User" },
+  bookingId: [{ type: mongoose.Types.ObjectId, ref: "Booking" }],
 });
-
 
 const Hotel = mongoose.model("Hotel", hotelSchema);
 module.exports = Hotel;
