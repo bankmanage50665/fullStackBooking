@@ -2,77 +2,79 @@ import { Link, json, useLoaderData } from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useContext } from "react";
-import HotelContext from "../context/hotelContext";
+import { FaPhoneAlt, FaEye } from "react-icons/fa";
+import { motion } from 'framer-motion';
 
+import HotelContext from "../context/hotelContext";
 
 export default function HotelsList() {
   const data = useLoaderData();
   const hoteles = data && data.hoteles;
 
-  console.log(hoteles)
-
-  const {token} = useContext(HotelContext)
   
+
   return (
     <>
-      <ul className="grid grid-cols-1 h-full md:grid-cols-2 lg:grid-cols-3 gap-8 bg-gradient-to-r from-gray-800 to-black p-8">
-        {hoteles.map((hotel) => (
-          <li
-            key={hotel.id}
-            className="flex items-center rounded-lg shadow-md overflow-hidden bg-black text-white"
-          >
-            <div className="w-1/2 h-full">
-              <Carousel
-                showThumbs={false}
-                showStatus={false}
-                autoPlay
-                infiniteLoop
-              >
-                {hotel.images.map((img, index) => (
-                  <div key={index}>
-                    <img src={`http://localhost/${img}`} alt={hotel.name} />
-                  </div>
-                ))}
-              </Carousel>
-            </div>
-            <div className="w-1/2 p-6">
-              <h3 className="text-xl font-semibold text-gold">{hotel.name}</h3>
-              <p className="text-sm mt-2">
-                <span className="text-gold font-bold">{`$${hotel.price}`}</span>{" "}
-                per night
-              </p>
-              <div className="flex items-center mt-2">
-                {/* <p className="text-sm">{hotel.address}</p> */}
-              </div>
-              <div className="flex items-center mt-4">
-                {/* <p className="text-sm">{hotel.phone}</p> */}
-              </div>
-              <button className="mt-4 block w-full bg-gold text-wheat font-semibold rounded-md shadow py-2 px-4">
-                Book via Call
-                {/* <svg
-                  className="w-5 h-5 text-gold mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-150 p-6 sm:p-8 md:p-12">
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {hoteles.map((hotel) => (
+            <motion.li
+              key={hotel.id}
+              className="bg-gray-700 rounded-xl overflow-hidden shadow-lg"
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="relative h-64 sm:h-72 lg:h-80">
+                <Carousel
+                  showThumbs={false}
+                  showStatus={false}
+                  showIndicators={true}
+                  autoPlay
+                  infiniteLoop
+                  className="h-full"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21V5a2 2 0 0 0-2-2H3a2 2 0 0 0-2 2v16c0 1.1 .9 2 2 2zM16 11h-1a1 1 0 0 0-1-1v-3a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1zM14 11h-1a1 1 0 0 0-1-1v-3a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1z"
-                  />
-                </svg> */}
-              </button>
-              <Link
-                to={`/hoteles/${hotel.id}`}
-                className="mt-4 block w-full bg-orange-300 text-black font-semibold rounded-md shadow py-2 px-4"
-              >
-                View
-              </Link>
-            </div>
-          </li>
-        ))}
-      </ul>
+                  {hotel.images.map((img, index) => (
+                    <div key={index} className="h-full">
+                      <img
+                        src={`http://localhost/${img}`}
+                        alt={hotel.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
+              <div className="p-6 space-y-4 mt-40">
+                <h3 className="text-2xl font-bold text-yellow-300">
+                  {hotel.name}
+                </h3>
+                <p className="text-lg text-gray-300">
+                  <span className="text-yellow-300 font-semibold">{`$${hotel.price}`}</span>{" "}
+                  per night
+                </p>
+                <motion.button
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg flex items-center justify-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaPhoneAlt className="mr-2" />
+                  Book via Call
+                </motion.button>
+                <Link to={`/hoteles/${hotel.id}`} className="block w-full">
+                  <motion.div
+                    className="w-full bg-gray-600 text-yellow-300 font-semibold py-3 px-4 rounded-lg flex items-center justify-center"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FaEye className="mr-2" />
+                    View Details
+                  </motion.div>
+                </Link>
+              </div>
+            </motion.li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

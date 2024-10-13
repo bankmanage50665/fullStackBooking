@@ -18,7 +18,8 @@ import OtpSignupForm, {
 } from "./shared/component/OtpSignupForm";
 import OtpLoginForm, { loginAction } from "./shared/component/OtpLoginForm";
 import { tokenLoader } from "./middleware/getToken";
-
+import BookingForm from "./component/BookingForm";
+import { logoutAction } from "./middleware/logout";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
       { index: true, element: <HotelsList />, loader: hotelListLoader },
       { path: "signup", element: <OtpSignupForm />, action: signupAction },
       { path: "login", element: <OtpLoginForm />, action: loginAction },
+      { path: "booking", element: <BookingForm /> },
       {
         path: "hoteles",
         children: [
@@ -54,6 +56,7 @@ const router = createBrowserRouter([
         element: <BookedHotel />,
         loader: bookedHotelLoader,
       },
+      { path: "logout", action: logoutAction },
     ],
   },
 ]);

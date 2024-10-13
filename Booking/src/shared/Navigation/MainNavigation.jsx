@@ -1,17 +1,9 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import HotelContext from "../../context/hotelContext";
-import { useContext } from "react";
+import { NavLink, useRouteLoaderData, Link, Form } from "react-router-dom";
+
+import { getUserId } from "../../middleware/getToken";
 export default function MainNavigation() {
-  const { hotelId, token, handleLogout } = useContext(HotelContext);
-  const navigate = useNavigate()
-
-
-
-  function handleLogoutUser() {
-    handleLogout()
-    navigate('/')
-
-  }
+  const userid = getUserId();
+  const token = useRouteLoaderData("root");
 
   return (
     <>
@@ -29,42 +21,49 @@ export default function MainNavigation() {
               Hotels
             </NavLink>
           </li>
-          {!token && <li>
-            <NavLink
-              to="/signup"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-gold font-bold border-b-2 border-gold"
-                  : "hover:text-gold transition duration-300"
-              }
-            >
-              Signup
-            </NavLink>
-          </li>}
-          {!token && <li>
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-gold font-bold border-b-2 border-gold"
-                  : "hover:text-gold transition duration-300"
-              }
-            >
-              Login
-            </NavLink>
-          </li>}
-          {token && <li>
-            <button
-              // className={({ isActive }) =>
-              //   isActive
-              //     ? "text-gold font-bold border-b-2 border-gold"
-              //     : "hover:text-gold transition duration-300"
-              // }
-              onClick={handleLogoutUser}
-            >
-              Logout
-            </button>
-          </li>}
+          {!token && (
+            <li>
+              <NavLink
+                to="/signup"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-gold font-bold border-b-2 border-gold"
+                    : "hover:text-gold transition duration-300"
+                }
+              >
+                Signup
+              </NavLink>
+            </li>
+          )}
+          {!token && (
+            <li>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-gold font-bold border-b-2 border-gold"
+                    : "hover:text-gold transition duration-300"
+                }
+              >
+                Login
+              </NavLink>
+            </li>
+          )}
+          {token && (
+            <li>
+              <Form
+                method="post"
+                action="/logout"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-gold font-bold border-b-2 border-gold"
+                    : "hover:text-gold transition duration-300"
+                }
+              >
+                <button>Logout</button>
+              </Form>
+            </li>
+          )}
           <li>
             <NavLink
               to="/hoteles/add"
@@ -78,10 +77,10 @@ export default function MainNavigation() {
             </NavLink>
           </li>
 
-          {hotelId && token && (
+          {token && (
             <li>
               <NavLink
-                to={`/booked/${hotelId}`}
+                to={`/booked/${userid}`}
                 className={({ isActive }) =>
                   isActive
                     ? "text-gold font-bold border-b-2 border-gold"

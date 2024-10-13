@@ -1,246 +1,250 @@
 import { useState } from "react";
-import { Link, useLoaderData, useNavigate, useRouteLoaderData, json, Form } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useNavigate,
+  useRouteLoaderData,
+  json,
+} from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { motion } from 'framer-motion';
-import { Clock, Users, Phone, CreditCard, Star, MapPin } from 'lucide-react';
-import { getUserId, getUserName } from "../middleware/getToken";
+import { motion } from "framer-motion";
+import { getUserId, getPhoneNumber } from "../middleware/getToken";
+import {
+  FaStar,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaCalendarAlt,
+  FaUsers,
+  FaUser,
+} from "react-icons/fa";
+import LoadingComponent from "../shared/component/LoadingComponent";
 
 export default function HotelRooms() {
-  const [checkinDate, setCheckinDate] = useState(new Date());
-  const [guestCount, setGuestCount] = useState(1);
-  const [book, setBook] = useState(null);
+  const [checkInDate, setCheckInDate] = useState("");
+  const [checkOutDate, setCheckOutDate] = useState("");
+  const [numberOfGuests, setNumberOfGuests] = useState(1);
+  const [userName, setUserName] = useState("");
+  const [loading, setIsLoading] = useState(false);
+
   const data = useLoaderData();
   const hotel = data?.hotel || {};
   const navigate = useNavigate();
   const token = useRouteLoaderData("root");
   const userId = getUserId();
-  const userName = getUserName();
+  const phoneNumber = getPhoneNumber();
 
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleDateChange = (e) => {
-    setCheckinDate(new Date(e.target.value));
-  };
+    const hotelId = hotel._id;
+    const bookingData = {
+      userId,
+      hotelId,
+      checkInDate,
+      checkOutDate,
+      numberOfGuests,
+      totalPrice: hotel.price,
+      userName,
+      phoneNumber,
+    };
 
-  async function handleHotelBooking(e, id) {
-
-    e.preventDefault()
-    setBook(true);
-
-    const formData = new FormData(e.target)
-    const userData = Object.fromEntries(formData.entries())
-    console.log({ ...userData, userId })
-
+    setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost/hoteles/${id}/book`, {
-        method: "PATCH",
+      const response = await fetch(`http://localhost:80/bookings`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ status: "Booked", userId, userData }),
+        body: JSON.stringify({ ...bookingData }),
       });
 
-      const resData = await res.json();
-      if (!res.ok) {
-        throw new Error(resData.message || "Something went wrong");
-      }
+      const resData = await response.json();
 
-      navigate(`/booked/${id}`);
+      console.log(resData);
     } catch (error) {
-      console.error("Error booking hotel:", error);
+      setIsLoading(false);
+      console.error("Error creating booking:", error);
     }
-    setBook(false);
-  }
+    navigate("/booked/:id");
+    setIsLoading(false);
+  };
 
   return (
-    <>    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-    >
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="mb-6"
-      >
+    <>
+      <div className="mt-5 ml-5">
         <Link
           to="../../"
-          className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold mb-6 transition duration-300 ease-in-out"
         >
-          <motion.span whileHover={{ x: -3 }} transition={{ duration: 0.2 }}>←</motion.span>
+          <motion.span whileHover={{ x: -3 }} transition={{ duration: 0.2 }}>
+            ←
+          </motion.span>
           <span className="ml-2">Back to all hotels</span>
         </Link>
-      </motion.div>
-
+      </div>
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="bg-white rounded-lg shadow-xl overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
       >
-        <div className="flex flex-col lg:flex-row">
-          <div className="lg:w-1/2">
-            <Carousel
-              showThumbs={false}
-              showStatus={false}
-              autoPlay={false}
-              infiniteLoop
-              interval={5000}
-              className="h-full"
-            >
-              {hotel.images && hotel.images.map((img, index) => (
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-xl shadow-2xl overflow-hidden"
+          >
+            <div className="md:flex">
+              <div className="md:w-1/2">
+                <Carousel
+                  showThumbs={false}
+                  showStatus={false}
+                  autoPlay={false}
+                  infiniteLoop={true}
+                  interval={5000}
+                  className="h-64 md:h-full"
+                >
+                  {hotel.images &&
+                    hotel.images.map((img, index) => (
+                      <motion.div
+                        key={index}
+                        className="h-64 md:h-full"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <img
+                          src={`http://localhost/${img}`}
+                          alt={`${hotel.name} - Image ${index + 1}`}
+                          className="object-cover w-full h-full"
+                        />
+                      </motion.div>
+                    ))}
+                </Carousel>
+              </div>
+              <div className="md:w-1/2 p-8">
                 <motion.div
-                  key={index}
-                  className="h-64 sm:h-96 lg:h-full"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <img src={`http://localhost/${img}`} alt={hotel.name} className="object-cover w-full h-full" />
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    {hotel.name}
+                  </h1>
+                  <div className="flex items-center mb-4">
+                    <FaStar className="w-5 h-5 text-yellow-500 mr-1" />
+                    <span className="text-gray-700 mr-4">4.8</span>
+                    <FaMapMarkerAlt className="w-5 h-5 text-gray-500 mr-1" />
+                    <span className="text-gray-700">Central Location</span>
+                  </div>
+                  <p className="text-3xl font-semibold text-blue-600 mb-6">
+                    {hotel.price}{" "}
+                    <span className="text-base text-gray-600">per night</span>
+                  </p>
+                  <p className="text-gray-600 mb-8">{hotel.description}</p>
+                  <div className="flex items-center mb-8">
+                    <FaPhone className="w-5 h-5 text-gray-500 mr-2" />
+                    <span className="text-gray-700">{hotel.phone}</span>
+                  </div>
                 </motion.div>
-              ))}
-            </Carousel>
-          </div>
 
-          <div className="p-6 lg:w-1/2 flex flex-col justify-between">
-            <div>
-              <motion.h1
-                className="text-3xl font-bold text-gray-900 mb-2"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-              >
-                {hotel.name}
-              </motion.h1>
-              <motion.div
-                className="flex items-center mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-              >
-                <Star className="w-5 h-5 text-yellow-500 mr-1" />
-                <span className="text-gray-700 mr-2">4.8</span>
-                <MapPin className="w-5 h-5 text-gray-500 mr-1" />
-                <span className="text-gray-700">Central Location</span>
-              </motion.div>
-              <motion.p
-                className="text-2xl font-semibold text-blue-600 mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-              >
-                {hotel.price} <span className="text-base text-gray-600">per night</span>
-              </motion.p>
-              <motion.p
-                className="text-gray-600 mb-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.9 }}
-              >
-                {hotel.description}
-              </motion.p>
-              <motion.div
-                className="flex items-center mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 1 }}
-              >
-                <Phone className="w-5 h-5 text-gray-500 mr-2" />
-                <span className="text-gray-700">{hotel.phone}</span>
-              </motion.div>
+                <motion.form
+                  onSubmit={handleSubmit}
+                  className="space-y-6"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label
+                        htmlFor="checkIn"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        <FaCalendarAlt className="inline mr-2" />
+                        Check-in Date
+                      </label>
+                      <input
+                        id="checkIn"
+                        type="date"
+                        value={checkInDate}
+                        onChange={(e) => setCheckInDate(e.target.value)}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="checkOut"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        <FaCalendarAlt className="inline mr-2" />
+                        Check-out Date
+                      </label>
+                      <input
+                        id="checkOut"
+                        type="date"
+                        value={checkOutDate}
+                        onChange={(e) => setCheckOutDate(e.target.value)}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="guests"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      <FaUsers className="inline mr-2" />
+                      Number of Guests
+                    </label>
+                    <input
+                      id="guests"
+                      type="number"
+                      value={numberOfGuests}
+                      onChange={(e) => setNumberOfGuests(e.target.value)}
+                      required
+                      min="1"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      <FaUser className="inline mr-2" />
+                      Your Name
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out"
+                  >
+                    {loading ? <LoadingComponent /> : "Book now & Pay at hotel"}
+                  </motion.button>
+                </motion.form>
+              </div>
             </div>
-
-            <Form onSubmit={(e) => handleHotelBooking(e, hotel._id)} >
-              <h2 className="text-xl font-semibold mb-4">Your details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="flex flex-col">
-                  <label htmlFor="checkin" className="mb-1 flex items-center">
-                    <Clock className="w-5 h-5 text-gray-500 mr-2" />
-                    Check-in Date
-                  </label>
-                  <input
-                    type="date"
-                    id="checkin"
-                    name="checkin"
-                    className="border rounded-md p-2"
-                    value={checkinDate.toISOString().split('T')[0]}
-                    onChange={handleDateChange}
-                  />
-                  <span className="text-sm text-gray-500 mt-1">{formatDate(checkinDate)}</span>
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="guest" className="mb-1 flex items-center">
-                    <Users className="w-5 h-5 text-gray-500 mr-2" />
-                    Number of Guests
-                  </label>
-                  <input
-                    type="number"
-                    id="guest"
-                    name="guest"
-                    value={guestCount}
-                    onChange={(e) => setGuestCount(e.target.value)}
-                    min="1"
-                    max="10"
-                    className="border rounded-md p-2"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="bookedFor" className="mb-1 flex items-center">
-                    <Users className="w-5 h-5 text-gray-500 mr-2" />
-                    Booked for
-                  </label>
-                  <input
-                    type="text"
-                    id="bookedFor"
-                    name="bookedFor"
-                    defaultValue={userName}
-                    className="border rounded-md p-2"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center mb-6">
-                <CreditCard className="w-5 h-5 text-gray-500 mr-2" />
-                <span className="text-gray-700">Free cancellation</span>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  disabled={book}
-                  // onClick={(e) => handleHotelBooking(e, hotel._id)}
-                  className={`bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition duration-300 ease-in-out ${book ? "opacity-50 cursor-not-allowed" : ""}`}
-                >
-                  {book ? "Booking..." : "Book Now && Pay at hotel"}
-                </motion.button>
-                <Link
-                  to="../../hotels"
-                  className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md transition duration-300 ease-in-out"
-                >
-                  View more hotels
-                </Link>
-              </div>
-            </Form>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
-    </motion.div>
-
-
-
     </>
-
   );
 }
-
 
 export async function loader({ request, params }) {
   const id = params.id;

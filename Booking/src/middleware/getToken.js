@@ -16,3 +16,7 @@ export function getUserName(req, res, next) {
   const name = localStorage.getItem("unserName");
   return name;
 }
+export function getPhoneNumber(req, res, next) {
+  const phoneNumber = localStorage.getItem("phoneNumber");
+  return phoneNumber;
+}

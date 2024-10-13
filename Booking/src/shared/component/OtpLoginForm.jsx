@@ -173,6 +173,7 @@ export async function loginAction({ request, params }) {
         localStorage.setItem("token", resData.token)
         localStorage.setItem("userid", resData.userId)
         localStorage.setItem("unserName", resData.userName)
+        localStorage.setItem("phoneNumber", resData.phoneNumber)
         console.log(resData)
 
         if (!res.ok) {
