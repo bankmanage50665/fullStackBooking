@@ -1,28 +1,29 @@
-import { Link, Form, useNavigation, useNavigate, json, useRouteLoaderData } from "react-router-dom";
-import { useContext, useState } from "react";
+import { Form, useNavigate, json, useRouteLoaderData } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { getUserId } from "../middleware/getToken";
 
-
-
 import ImageUpload from "../shared/component/ImageUpload";
-import HotelContext from "../context/hotelContext"
+import LoadingComponent from "../shared/component/LoadingComponent";
 
 export default function AddHoteles() {
-  const [isSubmiting, setIsSubmiting] = useState(null)
+  const [isSubmiting, setIsSubmiting] = useState(null);
   const [files, setFiles] = useState(null);
-  const navigation = useNavigation();
   const navigate = useNavigate();
-  const userid = getUserId()
-  const token = useRouteLoaderData("root")
+  const userid = getUserId();
+  const token = useRouteLoaderData("root");
 
-
+  useEffect(() => {
+    if (token === null || !token) {
+      navigate("/login");
+    }
+  }, [token]);
 
   function handleGetFiles(files) {
     setFiles(files);
   }
 
   async function handleAddHoteles(e) {
-    setIsSubmiting(true)
+    setIsSubmiting(true);
     e.preventDefault();
     const formData = new FormData();
     const formElement = e.target.elements;
@@ -42,23 +43,30 @@ export default function AddHoteles() {
     formData.append("type", hotelData.type);
     Array.from(files.map((img) => formData.append("images", img)));
 
-    const res = await fetch("http://localhost/hoteles/add", {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    });
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/hoteles/add`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
 
-    const resData = await res.json();
-    console.log(resData);
-    if (!res.ok) {
-      setIsSubmiting(false)
-      throw json({ message: resData.message }, { status: 500 });
+      const resData = await res.json();
+
+      if (!res.ok) {
+        setIsSubmiting(false);
+        throw json({ message: resData.message }, { status: 500 });
+      }
+    } catch (err) {
+      throw new Error("Field to adding hotel, Please try again later.", 500);
     }
 
     navigate("/");
-    setIsSubmiting(false)
+    setIsSubmiting(false);
   }
 
   return (
@@ -144,7 +152,7 @@ export default function AddHoteles() {
             type="submit"
             className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
           >
-            Add Hotels
+            {isSubmiting ? <LoadingComponent /> : "Add Hotels"}
           </button>
         </Form>
       </div>

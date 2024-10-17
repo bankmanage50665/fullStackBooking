@@ -5,27 +5,33 @@ import {
   useParams,
   useLoaderData,
   useRouteLoaderData,
+  json,
 } from "react-router-dom";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 
 import ImageUpload from "../shared/component/ImageUpload";
-
+import LoadingComponent from "../shared/component/LoadingComponent";
 
 export default function EditHoteles() {
   const [files, setFiles] = useState();
+  const [deleteing, setIsDeleteing] = useState(false);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmiting = navigation.state === "submitting";
   const sp = useParams();
   const hotelId = sp.id;
   const hotel = useLoaderData().hotel;
-  const token = useRouteLoaderData("root")
+  const token = useRouteLoaderData("root");
+
+  useEffect(() => {
+    if (token === null || !token) {
+      navigate("/login");
+    }
+  }, [token]);
 
   function handleGetImg(img) {
     setFiles(img);
   }
-
 
   async function handleUpdateHotel(e) {
     e.preventDefault();
@@ -49,34 +55,55 @@ export default function EditHoteles() {
     formData.append("status", hotelData.status);
     Array.from(files.map((img) => formData.append("images", img)));
 
-    const response = await fetch(`http://localhost/hoteles/${hotelId}`, {
-      method: "PATCH",
-      body: formData,
-      headers: {
-        Authorization: "Bearer " + token
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/hoteles/${hotelId}`,
+        {
+          method: "PATCH",
+          body: formData,
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+      const resData = await response.json();
+      if (!response.ok) {
+        throw new Error(resData.message);
       }
-    });
-    const resData = await response.json();
-    if (!response.ok) {
-      throw new Error(resData.message);
+    } catch (err) {
+      throw json(
+        { message: "Field to edit hotel details, Please try agin later." },
+        { status: 401 }
+      );
     }
     navigate(`/hoteles/${hotelId}`);
   }
 
   async function deleteHotel(id) {
-    const response = await fetch(`http://localhost/hoteles/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: "Bearer " + token
+    setIsDeleteing(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/hoteles/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+      const resData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resData.message);
       }
-    });
-    const resData = await response.json();
-
-    console.log(resData)
-    if (!response.ok) {
-      throw new Error(resData.message);
+    } catch (err) {
+      setIsDeleteing(false);
+      throw json(
+        { message: "Field to delete hotel details, Please try agin later." },
+        { status: 401 }
+      );
     }
-
+    setIsDeleteing(false);
     navigate("/");
   }
 
@@ -179,17 +206,17 @@ export default function EditHoteles() {
               type="submit"
               className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
             >
-              {isSubmiting ? "Updating..." : "  Update Hotels"}
+              {isSubmiting ? <LoadingComponent /> : "  Update Hotels"}
             </button>
           </Form>
           <div>
             <button
-              disabled={isSubmiting}
+              disabled={deleteing}
               onClick={() => deleteHotel(hotel.id)}
               type="submit"
               className="w-full py-2 bg-black text-yellow-200 rounded-md hover:bg-blue-700"
             >
-              {isSubmiting ? "Updating..." : "Delete Hotels"}
+              {deleteing ? <LoadingComponent /> : "Delete Hotels"}
             </button>
           </div>
         </div>

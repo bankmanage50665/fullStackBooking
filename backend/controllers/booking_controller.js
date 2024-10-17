@@ -31,9 +31,9 @@ exports.createBooking = async (req, res, next) => {
     checkOutDate,
     numberOfGuests,
     totalPrice,
-    status: "Booked",
     phoneNumber,
     userName,
+    status: "Booked",
   });
 
   let user;
@@ -53,8 +53,6 @@ exports.createBooking = async (req, res, next) => {
       new HttpError("Couldn't find user in database with that id", 500)
     );
   }
-
- 
 
   try {
     const sess = await mongoose.startSession();
@@ -112,11 +110,14 @@ exports.createBooking = async (req, res, next) => {
 exports.getAllBooking = async (req, res, next) => {
   let allBookings;
   try {
-    allBookings = await Booking.find().populate("userId").populate({
-      path: "hotelId",
-      model: "Hotel",
-      select: "-creator -bookingId",
-    });
+    allBookings = await Booking.find()
+      .populate("userId")
+      .populate({
+        path: "hotelId",
+        model: "Hotel",
+        select: "-creator -bookingId",
+      })
+      .sort({ createdAt: -1 });
   } catch (err) {
     return next(
       new HttpError("Field to load all bookings, Please try again later.", 500)
@@ -132,6 +133,8 @@ exports.getAllBooking = async (req, res, next) => {
 exports.getUserBookings = async (req, res, next) => {
   const userId = req.params.userId;
 
+
+
   if (!userId) {
     return next(new HttpError("Couldn't get id", 500));
   }
@@ -143,6 +146,8 @@ exports.getUserBookings = async (req, res, next) => {
       model: "Booking",
       populate: { path: "hotelId", model: "Hotel" },
     });
+
+ 
 
     res.json({
       message: "Booked hotel fetched sucessfully.",
@@ -161,7 +166,6 @@ exports.getUserBookings = async (req, res, next) => {
 // Cancel a booking
 exports.cancelBooking = async (req, res, next) => {
   const bookingId = req.params.bookingId;
-  const { status } = req.body;
 
   let booking;
   try {
@@ -176,12 +180,59 @@ exports.cancelBooking = async (req, res, next) => {
     return next("No booking find to cancel.", 500);
   }
 
-  booking.status = status;
+  let user;
+  try {
+    user = await User.findById(booking.userId).populate("bookedRooms");
+  } catch (err) {
+    return next(
+      new HttpError(
+        "Field to find user for bookig, Please try again later.",
+        500
+      )
+    );
+  }
 
-  // await booking.save()
+  if (!user) {
+    return next(
+      new HttpError("Couldn't find user in database with that id", 500)
+    );
+  }
 
   try {
-    await booking.save();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+
+    user.bookedRooms.pull(booking._id.toString());
+    await user.save({ session: sess });
+    sess.commitTransaction();
+  } catch (err) {
+    return next(
+      new HttpError("Field to cancel booking, Please try again later.", 500)
+    );
+  }
+
+  let hotel;
+  try {
+    hotel = await Hotel.findById(booking.hotelId);
+  } catch (err) {
+    return next(
+      new HttpError(
+        "Field to find user for bookig, Please try again later.",
+        500
+      )
+    );
+  }
+  if (!hotel) {
+    return next(new HttpError('Couldn"t find hotel with provided id', 500));
+  }
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await booking.deleteOne({ session: sess });
+    hotel.bookingId.pull(booking._id.toString());
+    await hotel.save({ session: sess });
+    sess.commitTransaction();
   } catch (err) {
     return next(
       new HttpError("Field to cancel booking, Please try again later.", 500)
@@ -190,11 +241,10 @@ exports.cancelBooking = async (req, res, next) => {
 
   res.json({
     message: "Hotel booking canceled sucessfully",
-    status: booking.status,
   });
 };
 
-exports.deleteBooking = async (req, res) => {
+exports.deleteBooking = async (req, res, next) => {
   const bookingId = req.params.bookingId;
 
   let booking;
@@ -238,4 +288,40 @@ exports.deleteBooking = async (req, res) => {
   }
 
   res.status(200).json({ message: "Booking delete sucessfully" });
+};
+
+exports.updateBooking = async (req, res, next) => {
+  const bookingId = req.params.bookingId;
+  const { numberOfGuests, checkOutDate, status } = req.body;
+
+  let booking;
+  try {
+    booking = await Booking.findById(bookingId);
+  } catch (err) {
+    return next(
+      new HttpError("Field to find booking, Please try again later.", 500)
+    );
+  }
+
+  if (!booking) {
+    return next("No booking find to cancel.", 500);
+  }
+
+  booking.status = status;
+  booking.numberOfGuests = numberOfGuests;
+
+  booking.checkOutDate = checkOutDate;
+
+  try {
+    await booking.save();
+  } catch (err) {
+    return next(
+      new HttpError("Field to update booking, Please try again later.", 500)
+    );
+  }
+
+  res.json({
+    message: "Hotel booking updated sucessfully by admin",
+    status: booking.status,
+  });
 };

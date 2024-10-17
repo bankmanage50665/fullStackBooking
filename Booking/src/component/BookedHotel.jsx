@@ -1,12 +1,19 @@
-import { json, useLoaderData, useNavigate, useParams } from "react-router-dom";
+import {
+  json,
+  useLoaderData,
+  useNavigate,
+  useParams,
+  useRouteLoaderData,
+} from "react-router-dom";
 import { motion } from "framer-motion";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { FaCalendarAlt, FaDollarSign, FaUser, FaPhone } from "react-icons/fa";
+import { FaCalendarAlt, FaDollarSign, FaUser } from "react-icons/fa";
 import { BiSolidHotel } from "react-icons/bi";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingComponent from "../shared/component/LoadingComponent";
+import HelplineNumber from "../shared/component/HelplineNumber";
 
 import { getUserId } from "../middleware/getToken";
 export default function BookedHotel() {
@@ -15,17 +22,26 @@ export default function BookedHotel() {
   const data = useLoaderData();
   const booking = data && data.booking;
   const navigate = useNavigate();
+  const token = useRouteLoaderData("root");
+
+  useEffect(() => {
+    if (token === null || !token) {
+      navigate("/login");
+    }
+  }, [token]);
 
   const handleCancelBooking = async (bookingId) => {
     try {
       setIsCanceled(true);
-      const res = await fetch(`http://localhost/bookings/${bookingId}/cancel`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "Canceled" }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/bookings/${bookingId}/cancel`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
       const resData = await res.json();
 
       if (!res.ok) {
@@ -45,22 +61,22 @@ export default function BookedHotel() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-12 text-center">
-            Your Booked Rooms
-          </h1>
-          {booking ? (
+          {booking && booking.bookedRooms.length >= 1 ? (
             <motion.ul
               className="space-y-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
+              <h1 className="text-5xl font-extrabold text-white mb-12 text-center">
+                Your Booked Rooms
+              </h1>
               {booking.bookedRooms.map((booking, index) => (
                 <motion.li
                   key={index}
-                  className="bg-white shadow-2xl rounded-2xl overflow-hidden transform transition duration-500 hover:scale-105"
+                  className="bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition duration-500 hover:scale-105"
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
@@ -77,7 +93,7 @@ export default function BookedHotel() {
                         {booking.hotelId.images.map((img, imgIndex) => (
                           <div key={imgIndex} className="full">
                             <img
-                              src={`http://localhost/${img}`}
+                              src={`${process.env.REACT_APP_BACKEND_URL}/${img}`}
                               alt={`Hotel image ${imgIndex + 1}`}
                               className="w-full h-full object-cover"
                             />
@@ -86,16 +102,16 @@ export default function BookedHotel() {
                       </Carousel>
                     </div>
                     <div className="p-10 md:w-3/5">
-                      <div className="uppercase tracking-wide text-sm text-indigo-600 font-bold mb-2">
+                      <div className="uppercase tracking-wide text-sm text-indigo-400 font-bold mb-2">
                         {booking.status}
                       </div>
-                      <h2 className="text-3xl leading-tight font-extrabold text-gray-900 mb-4">
+                      <h2 className="text-3xl leading-tight font-extrabold text-white mb-4">
                         {booking.hotelId.name}
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div>
-                          <p className="flex items-center text-gray-700">
-                            <FaCalendarAlt className="mr-2 text-indigo-500" />
+                          <p className="flex items-center text-gray-300">
+                            <FaCalendarAlt className="mr-2 text-indigo-400" />
                             Check-in:
                             <span className="ml-2 ">
                               {new Date(
@@ -105,8 +121,8 @@ export default function BookedHotel() {
                           </p>
                         </div>
                         <div>
-                          <p className="flex items-center text-gray-700">
-                            <FaCalendarAlt className="mr-2 text-indigo-500" />
+                          <p className="flex items-center text-gray-300">
+                            <FaCalendarAlt className="mr-2 text-indigo-400" />
                             Check-out:
                             <span className="ml-2">
                               {new Date(
@@ -116,15 +132,15 @@ export default function BookedHotel() {
                           </p>
                         </div>
                         <div>
-                          <p className="flex items-center text-gray-700">
-                            <FaDollarSign className="mr-2 text-indigo-500" />
-                            Total Ammound:
+                          <p className="flex items-center text-gray-300">
+                            <FaDollarSign className="mr-2 text-indigo-400" />
+                            Total Amount:
                             <span className="ml-2">{booking.totalPrice}</span>
                           </p>
                         </div>
                         <div>
-                          <p className="flex items-center text-gray-700">
-                            <FaUser className="mr-2 text-indigo-500" />
+                          <p className="flex items-center text-gray-300">
+                            <FaUser className="mr-2 text-indigo-400" />
                             Number of Guests:
                             <span className="ml-2">
                               {booking.numberOfGuests}
@@ -132,33 +148,25 @@ export default function BookedHotel() {
                           </p>
                         </div>
                         <div>
-                          <p className="flex items-center text-gray-700">
-                            <FaPhone className="mr-2 text-indigo-500" />
-                            Helpline number:
-                            <span className="ml-2">{booking.phoneNumber}</span>
-                          </p>
+                          <HelplineNumber phoneNumber={booking.phoneNumber} />
                         </div>
                       </div>
-                      <div className="border-t border-gray-200 pt-4">
-                        <p className="flex items-center text-gray-700 mb-2">
-                          <FaUser className="mr-2 text-indigo-500" />
+                      <div className="border-t border-gray-700 pt-4">
+                        <p className="flex items-center text-gray-300 mb-2">
+                          <FaUser className="mr-2 text-indigo-400" />
                           Booked by:{" "}
                           <span className="ml-2">{booking.userName}</span>
                         </p>
-                        {/* <p className="flex items-center text-gray-700">
-                          <FaPhone className="mr-2 text-indigo-500" />
-                          Phone: {booking.phoneNumber}
-                        </p> */}
                       </div>
                       <div>
-                        <p className={`flex items-center text-gray-700 `}>
-                          <BiSolidHotel className="mr-2 text-indigo-500" />
+                        <p className={`flex items-center text-gray-300`}>
+                          <BiSolidHotel className="mr-2 text-indigo-400" />
                           Booking status:
                           <span
                             className={`ml-2 ${
                               booking.status.toUpperCase() === "CANCELED"
-                                ? "text-red-500"
-                                : "text-green-600"
+                                ? "text-red-400"
+                                : "text-green-400"
                             }`}
                           >
                             {booking.status.toUpperCase()}
@@ -181,7 +189,6 @@ export default function BookedHotel() {
                         ) : (
                           "Cancel booking"
                         )}
-                        {/* {isCanceled ? <LoadingComponent /> : "Cancel booking"} */}
                       </motion.button>
                     </div>
                   </div>
@@ -189,7 +196,7 @@ export default function BookedHotel() {
               ))}
             </motion.ul>
           ) : (
-            <p className="text-center text-2xl text-gray-700">
+            <p className="text-center text-2xl text-gray-300">
               No bookings yet. Time to plan your next luxurious getaway!
             </p>
           )}
@@ -203,7 +210,9 @@ export async function loader() {
   const userid = getUserId();
 
   try {
-    const res = await fetch(`http://localhost/bookings/${userid}`);
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/bookings/${userid}`
+    );
     const data = await res.json();
 
     if (!res.ok) {

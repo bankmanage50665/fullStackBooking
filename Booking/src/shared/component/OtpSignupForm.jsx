@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaUser, FaPhone } from "react-icons/fa";
+import { FaPhone } from "react-icons/fa";
 import { Form, Link, json, redirect, useNavigation } from "react-router-dom";
 import React from "react";
 import { PulseLoader } from "react-spinners";
@@ -58,7 +58,7 @@ function OtpSignupForm() {
             </motion.button>
           </Form>
           <p className="text-center mt-6 text-gray-600">
-            Already have an account?{" "}
+            Already have an account?
             <Link
               to="/login"
               className="text-yellow-500 hover:text-yellow-600 font-semibold"
@@ -82,16 +82,19 @@ export async function action({ request, params }) {
   };
 
   try {
-    const res = await fetch("http://localhost:80/otp/register", {
-      method: "POST",
-      body: JSON.stringify(userData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/otp/register`,
+      {
+        method: "POST",
+        body: JSON.stringify(userData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const resData = await res.json();
 
-    console.log(resData);
+    
 
     if (!res.ok) {
       throw new Error(resData.message || "Field to loging user.");

@@ -61,6 +61,8 @@ async function sendOTP(req, res, next) {
   try {
     const { phoneNumber } = req.body;
 
+    
+
     const otp = OTPGenerator.generate(4, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
@@ -105,7 +107,7 @@ async function verifyOtp(req, res, next) {
 
   const { phoneNumber, otp } = req.body;
 
-  console.log(phoneNumber, otp);
+ 
 
   let user;
   try {

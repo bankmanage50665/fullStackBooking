@@ -4,7 +4,6 @@ import reportWebVitals from "./reportWebVitals";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AddHoteles from "./component/AddHotel";
-import AddRooms from "./component/AddRooms";
 import HotelsList, { loader as hotelListLoader } from "./component/HotelsList";
 import HotelRooms, { loader as hotelRoomLoader } from "./component/HotelRooms";
 import RootLayout from "./shared/Navigation/RootLayout";
@@ -17,14 +16,18 @@ import OtpSignupForm, {
   action as signupAction,
 } from "./shared/component/OtpSignupForm";
 import OtpLoginForm, { loginAction } from "./shared/component/OtpLoginForm";
-import { tokenLoader } from "./middleware/getToken";
-import BookingForm from "./component/BookingForm";
+import { tokenLoader, checkAuthLoader } from "./middleware/getToken";
 import { logoutAction } from "./middleware/logout";
+import GetAllBooking, {
+  loader as adminLoader,
+} from "./component/Admin/ManageBooking";
+import Error from "./shared/component/Error";
 
 const router = createBrowserRouter([
   {
     path: "",
     element: <RootLayout />,
+    errorElement: <Error />,
     loader: tokenLoader,
     id: "root",
 
@@ -32,9 +35,9 @@ const router = createBrowserRouter([
       { index: true, element: <HotelsList />, loader: hotelListLoader },
       { path: "signup", element: <OtpSignupForm />, action: signupAction },
       { path: "login", element: <OtpLoginForm />, action: loginAction },
-      { path: "booking", element: <BookingForm /> },
       {
         path: "hoteles",
+
         children: [
           { path: "add", element: <AddHoteles /> },
           {
@@ -57,6 +60,7 @@ const router = createBrowserRouter([
         loader: bookedHotelLoader,
       },
       { path: "logout", action: logoutAction },
+      { path: "admin", element: <GetAllBooking />, loader: adminLoader },
     ],
   },
 ]);

@@ -17,7 +17,7 @@ export default function AddRooms() {
       phone: formElement.phone.value,
     };
 
-    console.log(hotelData);
+    
   }
 
   return (

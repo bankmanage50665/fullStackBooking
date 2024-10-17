@@ -59,7 +59,7 @@ async function addHotle(req, res, next) {
 async function getHotelesList(req, res, next) {
   let hoteles;
   try {
-    hoteles = await Hotel.find();
+    hoteles = await Hotel.find().sort({ createdAt: -1 });
   } catch (err) {
     return next(new HttpError("Field to find list of hoteles.", 500));
   }
@@ -138,7 +138,7 @@ async function deleteHotel(req, res, next) {
 
   try {
     findHotelById = await Hotel.findById(hotelId);
-    console.log(findHotelById);
+    
   } catch (err) {
     return next(
       new HttpError("Field to delete hotel, Please try again later.", 500)

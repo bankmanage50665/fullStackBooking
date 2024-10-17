@@ -1,3 +1,5 @@
+import { redirect } from "react-router-dom";
+
 export function getToken(req, res, next) {
   const token = localStorage.getItem("token");
   return token;
@@ -19,4 +21,19 @@ export function getUserName(req, res, next) {
 export function getPhoneNumber(req, res, next) {
   const phoneNumber = localStorage.getItem("phoneNumber");
   return phoneNumber;
+}
+
+export function getCreator() {
+  const creatorId = localStorage.getItem("creator");
+
+  return creatorId;
+}
+
+export function checkAuthLoader() {
+  const token = getToken();
+  if (!token) {
+    return redirect("/login");
+  }
+
+  return null;
 }
