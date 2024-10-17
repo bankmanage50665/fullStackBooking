@@ -12,8 +12,7 @@ const hotelRoutes = require("./routes/hotel_routes.js");
 const HttpError = require("./middleware/HttpError.js");
 const otpRoute = require("./routes/user_routes.js");
 
-const url =
-  "mongodb+srv://rahul1234:rUr3yuJjvRxByRF0@cluster0.wdrbduw.mongodb.net/booking?retryWrites=true&w=majority&appName=Cluster0";
+const url = `mongodb+srv://${process.env.DB_USER_NAME}:${process.env.DB_USER_PASSWORD}@cluster0.wdrbduw.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use(bodyParser.json());
